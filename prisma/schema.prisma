@@ -1,0 +1,84 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model biblioteca_de_controles {
+  id_control_maestro          String                        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  codigo_norma                String                        @db.VarChar(50)
+  nombre_del_control          String                        @db.VarChar(255)
+  explicacion_del_control     String?
+  area_o_dominio              String?                       @db.VarChar(100)
+  tipo_control                String?                       @db.VarChar
+  seguimiento_de_cumplimiento seguimiento_de_cumplimiento[]
+}
+
+model empresas {
+  id_empresa                  String                        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  nombre_comercial            String                        @db.VarChar(150)
+  codigo_unico_url            String                        @unique @db.VarChar(100)
+  fecha_de_registro           DateTime?                     @default(now()) @db.Timestamptz(6)
+  seguimiento_de_cumplimiento seguimiento_de_cumplimiento[]
+  usuarios                    usuarios[]
+}
+
+model evidencias_del_control {
+  id_evidencia                String                       @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  seguimiento_id              String?                      @db.Uuid
+  nombre_del_archivo          String                       @db.VarChar(255)
+  link_al_archivo             String
+  usuario_que_subio_id        String?                      @db.Uuid
+  fecha_de_subida             DateTime?                    @default(now()) @db.Timestamptz(6)
+  seguimiento_de_cumplimiento seguimiento_de_cumplimiento? @relation(fields: [seguimiento_id], references: [id_seguimiento], onDelete: Cascade, onUpdate: NoAction)
+  usuarios                    usuarios?                    @relation(fields: [usuario_que_subio_id], references: [id_usuario], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model seguimiento_de_cumplimiento {
+  id_seguimiento            String                   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  empresa_id                String?                  @db.Uuid
+  control_id                String?                  @db.Uuid
+  estado_id                 Int?
+  nombre_del_responsable    String?                  @db.VarChar(150)
+  quien_actualizo_id        String?                  @db.Uuid
+  fecha_de_modificacion     DateTime?                @default(now()) @db.Timestamptz(6)
+  descripcion_justificacion String?
+  evidencias_del_control    evidencias_del_control[]
+  biblioteca_de_controles   biblioteca_de_controles? @relation(fields: [control_id], references: [id_control_maestro], onDelete: NoAction, onUpdate: NoAction)
+  empresas                  empresas?                @relation(fields: [empresa_id], references: [id_empresa], onDelete: Cascade, onUpdate: NoAction)
+  estados_de_control        estados_de_control?      @relation(fields: [estado_id], references: [id_estado], onDelete: NoAction, onUpdate: NoAction)
+  usuarios                  usuarios?                @relation(fields: [quien_actualizo_id], references: [id_usuario], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([empresa_id, control_id], map: "control_unico_por_empresa")
+}
+
+model usuarios {
+  id_usuario                  String                        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  empresa_id                  String?                       @db.Uuid
+  rol_id                      Int?
+  nombre_usuario              String                        @db.VarChar(150)
+  correo_electronico          String                        @unique(map: "email_unico") @db.VarChar(150)
+  contrasena_encriptada       String
+  fecha_registro              DateTime?                     @default(now()) @db.Timestamptz(6)
+  evidencias_del_control      evidencias_del_control[]
+  seguimiento_de_cumplimiento seguimiento_de_cumplimiento[]
+  empresas                    empresas?                     @relation(fields: [empresa_id], references: [id_empresa], onDelete: Cascade, onUpdate: NoAction)
+  roles_de_usuario            roles_de_usuario?             @relation(fields: [rol_id], references: [id_rol], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model estados_de_control {
+  id_estado                   Int                           @id @default(autoincrement())
+  nombre_del_estado           String                        @unique @db.VarChar(50)
+  descripcion_del_estado      String?
+  seguimiento_de_cumplimiento seguimiento_de_cumplimiento[]
+}
+
+model roles_de_usuario {
+  id_rol                  Int        @id @default(autoincrement())
+  nombre_del_rol          String     @db.VarChar(50)
+  descripcion_del_permiso String?
+  usuarios                usuarios[]
+}
