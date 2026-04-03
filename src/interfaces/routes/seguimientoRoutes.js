@@ -1,20 +1,89 @@
-const express = require("express");
-const SeguimientoController = require("../controllers/SeguimientoController");
-const SeguimientoService = require("../../application/seguimiento/SeguimientoService");
-const SeguimientoRepository = require("../../infrastructure/repositories/SeguimientoRepository");
-const ControlRepository = require("../../infrastructure/repositories/ControlRepository");
-const EmpresaRepository = require("../../infrastructure/repositories/EmpresaRepository");
-
+const express = require('express');
 const router = express.Router();
-const seguimientoRepository = new SeguimientoRepository();
-const controlRepository = new ControlRepository();
-const empresaRepository = new EmpresaRepository();
-const seguimientoService = new SeguimientoService(
-  seguimientoRepository,
-  controlRepository,
-  empresaRepository,
+const SeguimientoController = require('../controllers/SeguimientoController');
+const SeguimientoService = require('../../application/seguimiento/SeguimientoService');
+const SeguimientoRepository = require('../../infrastructure/repositories/SeguimientoRepository');
+const ControlRepository = require('../../infrastructure/repositories/ControlRepository');
+
+const seguimientoController = new SeguimientoController(
+  new SeguimientoService(new SeguimientoRepository(), new ControlRepository())
 );
-const seguimientoController = new SeguimientoController(seguimientoService);
+
+/**
+ * @swagger
+ * /seguimiento:
+ *   get:
+ *     summary: Obtener seguimientos por empresa
+ *     tags: [Seguimiento]
+ *     parameters:
+ *       - in: query
+ *         name: empresa_id
+ *         required: true
+ *         schema: { type: string }
+ *         description: ID de la empresa (UUID)
+ *     responses:
+ *       200: { description: Lista de seguimientos }
+ *       400: { description: Falta empresa_id }
+ */
+router.get('/', (req, res) => seguimientoController.getByEmpresa(req, res));
+
+/**
+ * @swagger
+ * /seguimiento/resumen:
+ *   get:
+ *     summary: Resumen de cumplimiento por empresa
+ *     tags: [Seguimiento]
+ *     parameters:
+ *       - in: query
+ *         name: empresa_id
+ *         required: true
+ *         schema: { type: string }
+ *         description: ID de la empresa (UUID)
+ *     responses:
+ *       200: { description: Resumen estadístico }
+ *       400: { description: Falta empresa_id }
+ */
+router.get('/resumen', (req, res) => seguimientoController.getResumen(req, res));
+
+/**
+ * @swagger
+ * /seguimiento/historial/{controlId}:
+ *   get:
+ *     summary: Historial de cambios de un control
+ *     tags: [Seguimiento]
+ *     parameters:
+ *       - in: path
+ *         name: controlId
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200: { description: Historial de seguimientos }
+ */
+router.get('/historial/:controlId', (req, res) => seguimientoController.getHistorial(req, res));
+
+/**
+ * @swagger
+ * /seguimiento:
+ *   post:
+ *     summary: Crear un nuevo seguimiento
+ *     tags: [Seguimiento]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               empresa_id: { type: string }
+ *               control_id: { type: string }
+ *               estado_id: { type: integer }
+ *               nombre_del_responsable: { type: string }
+ *               descripcion_justificacion: { type: string }
+ *     responses:
+ *       201: { description: Seguimiento creado }
+ *       400: { description: Datos inválidos }
+ */
+router.post('/', (req, res) => seguimientoController.create(req, res));
 
 /**
  * @swagger
@@ -34,31 +103,12 @@ const seguimientoController = new SeguimientoController(seguimientoService);
  *           schema:
  *             type: object
  *             properties:
- *               estado: { type: string }
- *               observaciones: { type: string }
+ *               estado_id: { type: integer }
+ *               descripcion_justificacion: { type: string }
  *     responses:
- *       200: { description: Actualizado correctamente }
+ *       200: { description: Seguimiento actualizado }
  *       404: { description: No encontrado }
  */
-router.put("/:id", (req, res) => seguimientoController.update(req, res));
-
-/**
- * @swagger
- * /seguimiento/empresa/{empresaId}:
- *   get:
- *     summary: Obtener seguimientos por empresa
- *     tags: [Seguimiento]
- *     parameters:
- *       - in: path
- *         name: empresaId
- *         required: true
- *         schema: { type: string }
- *     responses:
- *       200: { description: Lista de seguimientos }
- *       404: { description: Empresa no encontrada }
- */
-router.get("/empresa/:empresaId", (req, res) =>
-  seguimientoController.getByEmpresa(req, res),
-);
+router.put('/:id', (req, res) => seguimientoController.update(req, res));
 
 module.exports = router;

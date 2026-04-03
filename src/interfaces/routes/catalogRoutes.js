@@ -1,26 +1,6 @@
-const express = require("express");
-const CatalogController = require("../controllers/CatalogController");
-const CatalogService = require("../../application/common/CatalogService");
-const RolRepository = require("../../infrastructure/repositories/RolRepository");
-const EstadoRepository = require("../../infrastructure/repositories/EstadoRepository");
-
+const express = require('express');
 const router = express.Router();
-const rolRepository = new RolRepository();
-const estadoRepository = new EstadoRepository();
-const catalogService = new CatalogService(rolRepository, estadoRepository);
-const catalogController = new CatalogController(catalogService);
-
-/**
- * @swagger
- * /catalog/roles:
- *   get:
- *     summary: Obtener todos los roles
- *     tags: [Catálogos]
- *     responses:
- *       200: { description: Lista de roles }
- *       500: { description: Error interno }
- */
-router.get("/roles", (req, res) => catalogController.getRoles(req, res));
+const prisma = require('../../infrastructure/database/prisma');
 
 /**
  * @swagger
@@ -30,8 +10,32 @@ router.get("/roles", (req, res) => catalogController.getRoles(req, res));
  *     tags: [Catálogos]
  *     responses:
  *       200: { description: Lista de estados }
- *       500: { description: Error interno }
  */
-router.get("/estados", (req, res) => catalogController.getEstados(req, res));
+router.get('/estados', async (req, res) => {
+  try {
+    const estados = await prisma.estados_de_control.findMany({ orderBy: { id_estado: 'asc' } });
+    res.json(estados);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+/**
+ * @swagger
+ * /catalog/roles:
+ *   get:
+ *     summary: Obtener todos los roles de usuario
+ *     tags: [Catálogos]
+ *     responses:
+ *       200: { description: Lista de roles }
+ */
+router.get('/roles', async (req, res) => {
+  try {
+    const roles = await prisma.roles_de_usuario.findMany({ orderBy: { id_rol: 'asc' } });
+    res.json(roles);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
 
 module.exports = router;

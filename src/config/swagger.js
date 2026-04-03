@@ -13,9 +13,9 @@ const options = {
         url: 'http://localhost:3000/api',
         description: 'Servidor de desarrollo',
       },
-      // Cuando despliegues, agrega la URL de producción:
+      //  URL de producción:
       // {
-      //   url: 'https://tudominio.com/api',
+      //   url: 'https://dominio.com/api',
       //   description: 'Servidor de producción',
       // }
     ],
@@ -30,7 +30,7 @@ const options = {
     },
     security: [{ bearerAuth: [] }],
   },
-  apis: ['./src/interfaces/routes/*.js', './src/domain/entities/*.js'], // Rutas donde buscar comentarios
+  apis: ['./src/interfaces/routes/*.js', './src/domain/entities/*.js'], 
 };
 
 const swaggerSpec = swaggerJsdoc(options);
