@@ -1,12 +1,12 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const AdminController = require('../controllers/AdminController');
-const AdminService = require('../../application/admin/AdminService');
-const UsuarioRepository = require('../../infrastructure/repositories/UsuarioRepository');
-const EmpresaRepository = require('../../infrastructure/repositories/EmpresaRepository');
+const AdminController = require("../controllers/AdminController");
+const AdminService = require("../../application/admin/AdminService");
+const UsuarioRepository = require("../../infrastructure/repositories/UsuarioRepository");
+const EmpresaRepository = require("../../infrastructure/repositories/EmpresaRepository");
 
 const adminController = new AdminController(
-  new AdminService(new UsuarioRepository(), new EmpresaRepository())
+  new AdminService(new UsuarioRepository(), new EmpresaRepository()),
 );
 
 /**
@@ -26,11 +26,11 @@ const adminController = new AdminController(
  *       400: { description: Falta empresa_id }
  *       401: { description: No autorizado }
  */
-router.get('/empresa', (req, res) => adminController.getEmpresa(req, res));
+router.get("/empresa", (req, res) => adminController.getEmpresa(req, res));
 
 /**
  * @swagger
- * /admin/usuarios:
+ * /admin/Lista-usuarios:
  *   get:
  *     summary: Listar usuarios de una empresa
  *     tags: [Admin]
@@ -45,11 +45,13 @@ router.get('/empresa', (req, res) => adminController.getEmpresa(req, res));
  *       400: { description: Falta empresa_id }
  *       401: { description: No autorizado }
  */
-router.get('/usuarios', (req, res) => adminController.listarUsuarios(req, res));
+router.get("/Lista-usuarios", (req, res) =>
+  adminController.listarUsuarios(req, res),
+);
 
 /**
  * @swagger
- * /admin/usuarios:
+ * /admin/Crear-usuarios:
  *   post:
  *     summary: Crear un nuevo usuario
  *     tags: [Admin]
@@ -62,14 +64,16 @@ router.get('/usuarios', (req, res) => adminController.listarUsuarios(req, res));
  *             properties:
  *               nombre_usuario: { type: string }
  *               correo_electronico: { type: string }
- *               contrasena_encriptada: { type: string }
+ *               password: { type: string }
  *               empresa_id: { type: string }
  *               rol_id: { type: integer }
  *     responses:
  *       201: { description: Usuario creado }
  *       400: { description: Datos inválidos }
  */
-router.post('/usuarios', (req, res) => adminController.crearUsuario(req, res));
+router.post("/Crear-usuarios", (req, res) =>
+  adminController.crearUsuario(req, res),
+);
 
 /**
  * @swagger
@@ -92,10 +96,13 @@ router.post('/usuarios', (req, res) => adminController.crearUsuario(req, res));
  *               nombre_usuario: { type: string }
  *               correo_electronico: { type: string }
  *               rol_id: { type: integer }
+ *               empresa_id: { type: string }
  *     responses:
  *       200: { description: Usuario actualizado }
  *       404: { description: Usuario no encontrado }
  */
-router.put('/usuarios/:id', (req, res) => adminController.editarUsuario(req, res));
+router.put("/usuarios/:id", (req, res) =>
+  adminController.editarUsuario(req, res),
+);
 
 module.exports = router;
