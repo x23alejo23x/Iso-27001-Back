@@ -1,5 +1,4 @@
 // src/infrastructure/middleware/session.js
-// Manejo de sesión simple en servidor (sin JWT, según SRS stack)
 
 const sessions = new Map(); // En producción usar express-session con store en BD
 
@@ -17,7 +16,6 @@ function destroySession(sessionId) {
   sessions.delete(sessionId);
 }
 
-// Middleware: verifica que hay sesión activa
 function requireAuth(req, res, next) {
   const sessionId = req.headers['x-session-id'] || req.cookies?.sessionId;
   if (!sessionId) return res.status(401).json({ message: 'No autenticado' });
@@ -30,7 +28,6 @@ function requireAuth(req, res, next) {
   next();
 }
 
-// Middleware: verifica rol (1=Administrador, 2=Auditor, 3=Visor)
 function requireRol(...rolesPermitidos) {
   return (req, res, next) => {
     if (!req.user) return res.status(401).json({ message: 'No autenticado' });
@@ -41,7 +38,6 @@ function requireRol(...rolesPermitidos) {
   };
 }
 
-// Middleware: verifica que el usuario solo accede a datos de su empresa
 function requireMismaEmpresa(req, res, next) {
   const empresaIdParam = req.params.empresaId || req.body.empresa_id;
   if (empresaIdParam && empresaIdParam !== req.user.empresa_id) {
