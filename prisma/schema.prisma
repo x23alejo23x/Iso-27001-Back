@@ -14,7 +14,25 @@ model biblioteca_de_controles {
   explicacion_del_control     String?
   area_o_dominio              String?                       @db.VarChar(100)
   tipo_control                String?                       @db.VarChar
+  prioridad                   String?                       @default("Media") @db.VarChar(20) 
   seguimiento_de_cumplimiento seguimiento_de_cumplimiento[]
+}
+
+model departamentos {
+  id_departamento     String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  empresa_id          String    @db.Uuid
+  nombre_departamento String    @db.VarChar(100)
+  descripcion         String?   @db.Text
+  created_at          DateTime? @default(now()) @db.Timestamptz(6)
+  updated_at          DateTime? @default(now()) @db.Timestamptz(6)
+  
+  // Relaciones
+  empresa  empresas  @relation(fields: [empresa_id], references: [id_empresa], onDelete: Cascade)
+  usuarios usuarios[]
+  
+  @@unique([empresa_id, nombre_departamento])
+  @@index([empresa_id])
+  @@index([nombre_departamento])
 }
 
 model empresas {
@@ -24,6 +42,14 @@ model empresas {
   fecha_de_registro           DateTime?                     @default(now()) @db.Timestamptz(6)
   seguimiento_de_cumplimiento seguimiento_de_cumplimiento[]
   usuarios                    usuarios[]
+  departamentos               departamentos[]
+}
+
+model estados_de_control {
+  id_estado                   Int                           @id @default(autoincrement())
+  nombre_del_estado           String                        @unique @db.VarChar(50)
+  descripcion_del_estado      String?
+  seguimiento_de_cumplimiento seguimiento_de_cumplimiento[]
 }
 
 model evidencias_del_control {
@@ -35,6 +61,13 @@ model evidencias_del_control {
   fecha_de_subida             DateTime?                    @default(now()) @db.Timestamptz(6)
   seguimiento_de_cumplimiento seguimiento_de_cumplimiento? @relation(fields: [seguimiento_id], references: [id_seguimiento], onDelete: Cascade, onUpdate: NoAction)
   usuarios                    usuarios?                    @relation(fields: [usuario_que_subio_id], references: [id_usuario], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model roles_de_usuario {
+  id_rol                  Int        @id @default(autoincrement())
+  nombre_del_rol          String     @db.VarChar(50)
+  descripcion_del_permiso String?
+  usuarios                usuarios[]
 }
 
 model seguimiento_de_cumplimiento {
@@ -63,22 +96,10 @@ model usuarios {
   correo_electronico          String                        @unique(map: "email_unico") @db.VarChar(150)
   contrasena_encriptada       String
   fecha_registro              DateTime?                     @default(now()) @db.Timestamptz(6)
+  departamento_id             String?                       @db.Uuid
   evidencias_del_control      evidencias_del_control[]
   seguimiento_de_cumplimiento seguimiento_de_cumplimiento[]
   empresas                    empresas?                     @relation(fields: [empresa_id], references: [id_empresa], onDelete: Cascade, onUpdate: NoAction)
   roles_de_usuario            roles_de_usuario?             @relation(fields: [rol_id], references: [id_rol], onDelete: NoAction, onUpdate: NoAction)
-}
-
-model estados_de_control {
-  id_estado                   Int                           @id @default(autoincrement())
-  nombre_del_estado           String                        @unique @db.VarChar(50)
-  descripcion_del_estado      String?
-  seguimiento_de_cumplimiento seguimiento_de_cumplimiento[]
-}
-
-model roles_de_usuario {
-  id_rol                  Int        @id @default(autoincrement())
-  nombre_del_rol          String     @db.VarChar(50)
-  descripcion_del_permiso String?
-  usuarios                usuarios[]
+  departamento                departamentos?                @relation(fields: [departamento_id], references: [id_departamento])
 }
