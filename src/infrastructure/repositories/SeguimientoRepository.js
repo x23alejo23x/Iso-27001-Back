@@ -1,18 +1,19 @@
 // src/infrastructure/repositories/SeguimientoRepository.js
-const ISeguimientoRepository = require('../../domain/repositories/ISeguimientoRepository');
-const prisma = require('../database/prisma');
+const ISeguimientoRepository = require("../../domain/repositories/ISeguimientoRepository");
+const prisma = require("../database/prisma");
 
 class SeguimientoRepository extends ISeguimientoRepository {
-  async create(data) {
-    return await prisma.seguimiento_de_cumplimiento.create({
-      data,
-      include: {
-        biblioteca_de_controles: true,
-        estados_de_control: true,
+  async findByControlAndEmpresa(controlId, empresaId) {
+    return await prisma.seguimiento_de_cumplimiento.findFirst({
+      where: {
+        control_id: controlId,
+        empresa_id: empresaId,
+      },
+      orderBy: {
+        fecha_de_modificacion: "desc",
       },
     });
   }
-
   async findById(id) {
     return await prisma.seguimiento_de_cumplimiento.findUnique({
       where: { id_seguimiento: id },
@@ -23,6 +24,24 @@ class SeguimientoRepository extends ISeguimientoRepository {
     return await prisma.seguimiento_de_cumplimiento.update({
       where: { id_seguimiento: id },
       data,
+      include: {
+        biblioteca_de_controles: true,
+        estados_de_control: true,
+      },
+    });
+  }
+
+  async create(data) {
+    return await prisma.seguimiento_de_cumplimiento.create({
+      data: {
+        control_id: data.control_id,
+        empresa_id: data.empresa_id,
+        estado_id: data.estado_id,
+        nombre_del_responsable: data.nombre_del_responsable,
+        descripcion_justificacion: data.descripcion_justificacion,
+        quien_actualizo_id: data.quien_actualizo_id,
+        fecha_de_modificacion: new Date(),
+      },
       include: {
         biblioteca_de_controles: true,
         estados_de_control: true,
@@ -42,7 +61,7 @@ class SeguimientoRepository extends ISeguimientoRepository {
         estados_de_control: true,
         usuarios: { select: { nombre_usuario: true } },
       },
-      orderBy: { fecha_de_modificacion: 'desc' },
+      orderBy: { fecha_de_modificacion: "desc" },
     });
   }
 
@@ -67,7 +86,7 @@ class SeguimientoRepository extends ISeguimientoRepository {
         estados_de_control: true,
         usuarios: { select: { nombre_usuario: true } },
       },
-      orderBy: { fecha_de_modificacion: 'desc' },
+      orderBy: { fecha_de_modificacion: "desc" },
       take: 10,
     });
   }

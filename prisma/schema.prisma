@@ -14,22 +14,20 @@ model biblioteca_de_controles {
   explicacion_del_control     String?
   area_o_dominio              String?                       @db.VarChar(100)
   tipo_control                String?                       @db.VarChar
-  prioridad                   String?                       @default("Media") @db.VarChar(20) 
+  prioridad                   String?                       @default("Media") @db.VarChar(20)
   seguimiento_de_cumplimiento seguimiento_de_cumplimiento[]
 }
 
 model departamentos {
-  id_departamento     String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  empresa_id          String    @db.Uuid
-  nombre_departamento String    @db.VarChar(100)
-  descripcion         String?   @db.Text
-  created_at          DateTime? @default(now()) @db.Timestamptz(6)
-  updated_at          DateTime? @default(now()) @db.Timestamptz(6)
-  
-  // Relaciones
-  empresa  empresas  @relation(fields: [empresa_id], references: [id_empresa], onDelete: Cascade)
-  usuarios usuarios[]
-  
+  id_departamento     String     @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  empresa_id          String     @db.Uuid
+  nombre_departamento String     @db.VarChar(100)
+  descripcion         String?
+  created_at          DateTime?  @default(now()) @db.Timestamptz(6)
+  updated_at          DateTime?  @default(now()) @db.Timestamptz(6)
+  empresa             empresas   @relation(fields: [empresa_id], references: [id_empresa], onDelete: Cascade)
+  usuarios            usuarios[]
+
   @@unique([empresa_id, nombre_departamento])
   @@index([empresa_id])
   @@index([nombre_departamento])
@@ -40,9 +38,9 @@ model empresas {
   nombre_comercial            String                        @db.VarChar(150)
   codigo_unico_url            String                        @unique @db.VarChar(100)
   fecha_de_registro           DateTime?                     @default(now()) @db.Timestamptz(6)
+  departamentos               departamentos[]
   seguimiento_de_cumplimiento seguimiento_de_cumplimiento[]
   usuarios                    usuarios[]
-  departamentos               departamentos[]
 }
 
 model estados_de_control {
@@ -85,7 +83,7 @@ model seguimiento_de_cumplimiento {
   estados_de_control        estados_de_control?      @relation(fields: [estado_id], references: [id_estado], onDelete: NoAction, onUpdate: NoAction)
   usuarios                  usuarios?                @relation(fields: [quien_actualizo_id], references: [id_usuario], onDelete: NoAction, onUpdate: NoAction)
 
-  @@unique([empresa_id, control_id], map: "control_unico_por_empresa")
+  @@index([empresa_id, control_id], map: "seguimiento_empresa_control_idx")
 }
 
 model usuarios {
@@ -99,7 +97,7 @@ model usuarios {
   departamento_id             String?                       @db.Uuid
   evidencias_del_control      evidencias_del_control[]
   seguimiento_de_cumplimiento seguimiento_de_cumplimiento[]
+  departamento                departamentos?                @relation(fields: [departamento_id], references: [id_departamento])
   empresas                    empresas?                     @relation(fields: [empresa_id], references: [id_empresa], onDelete: Cascade, onUpdate: NoAction)
   roles_de_usuario            roles_de_usuario?             @relation(fields: [rol_id], references: [id_rol], onDelete: NoAction, onUpdate: NoAction)
-  departamento                departamentos?                @relation(fields: [departamento_id], references: [id_departamento])
 }

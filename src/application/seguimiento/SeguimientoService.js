@@ -6,28 +6,69 @@ class SeguimientoService {
     this.controlRepository = controlRepository;
   }
 
-  async create(data) {
-    const control = await this.controlRepository.findById(data.control_id);
-    if (!control) throw new Error('Control no encontrado');
+  async upsert(data) {
+    const existing = await this.seguimientoRepository.findByControlAndEmpresa(
+      data.control_id,
+      data.empresa_id,
+    );
 
-    return await this.seguimientoRepository.create(data);
+    if (existing && existing.estado_id === data.estado_id) {
+      return existing;
+    }
+    return await this.seguimientoRepository.create({
+      control_id: data.control_id,
+      empresa_id: data.empresa_id,
+      estado_id: data.estado_id,
+      nombre_del_responsable: data.nombre_del_responsable,
+      descripcion_justificacion: data.descripcion_justificacion,
+      quien_actualizo_id: data.quien_actualizo_id,
+    });
   }
-
   async update(id, data, empresaId) {
     const seguimiento = await this.seguimientoRepository.findById(id);
     if (!seguimiento || seguimiento.empresa_id !== empresaId)
-      throw new Error('Seguimiento no encontrado o no pertenece a su empresa');
+      throw new Error("Seguimiento no encontrado o no pertenece a su empresa");
 
     return await this.seguimientoRepository.update(id, data);
   }
 
   async getByEmpresa(empresaId, estadoId = null) {
-    return await this.seguimientoRepository.findByEmpresa(empresaId, estadoId);
+    const all = await this.seguimientoRepository.findByEmpresa(
+      empresaId,
+      estadoId,
+    );
+    const ultimos = new Map();
+    for (const seg of all) {
+      const controlId = seg.control_id;
+      if (
+        !ultimos.has(controlId) ||
+        new Date(seg.fecha_de_modificacion) >
+          new Date(ultimos.get(controlId).fecha_de_modificacion)
+      ) {
+        ultimos.set(controlId, seg);
+      }
+    }
+    return Array.from(ultimos.values());
   }
 
   async getResumen(empresaId) {
     const TOTAL_CONTROLES = 93;
-    const seguimientos = await this.seguimientoRepository.findByEmpresa(empresaId);
+    const todos = await this.seguimientoRepository.findByEmpresa(empresaId);
+
+    // Quedarse solo con el último registro por control
+    const ultimosPorControl = new Map();
+    for (const seg of todos) {
+      const controlId = seg.control_id;
+      if (
+        !ultimosPorControl.has(controlId) ||
+        new Date(seg.fecha_de_modificacion) >
+          new Date(ultimosPorControl.get(controlId).fecha_de_modificacion)
+      ) {
+        ultimosPorControl.set(controlId, seg);
+      }
+    }
+
+    const seguimientos = Array.from(ultimosPorControl.values());
 
     const conteo = {
       NO_INICIADO: 0,
@@ -48,7 +89,9 @@ class SeguimientoService {
 
     const porcentajeCumplimiento =
       evaluados > 0
-        ? Math.round(((conteo.CUMPLE + conteo.NO_APLICA) / TOTAL_CONTROLES) * 100)
+        ? Math.round(
+            ((conteo.CUMPLE + conteo.NO_APLICA) / TOTAL_CONTROLES) * 100,
+          )
         : 0;
 
     return {

@@ -1,13 +1,15 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const SeguimientoController = require('../controllers/SeguimientoController');
-const SeguimientoService = require('../../application/seguimiento/SeguimientoService');
-const SeguimientoRepository = require('../../infrastructure/repositories/SeguimientoRepository');
-const ControlRepository = require('../../infrastructure/repositories/ControlRepository');
-
-const seguimientoController = new SeguimientoController(
-  new SeguimientoService(new SeguimientoRepository(), new ControlRepository())
+const SeguimientoController = require("../controllers/SeguimientoController");
+const SeguimientoService = require("../../application/seguimiento/SeguimientoService");
+const SeguimientoRepository = require("../../infrastructure/repositories/SeguimientoRepository");
+const ControlRepository = require("../../infrastructure/repositories/ControlRepository");
+const seguimientoService = new SeguimientoService(
+  new SeguimientoRepository(),
+  new ControlRepository(),
 );
+
+const seguimientoController = new SeguimientoController(seguimientoService);
 
 /**
  * @swagger
@@ -19,13 +21,16 @@ const seguimientoController = new SeguimientoController(
  *       - in: query
  *         name: empresa_id
  *         required: true
- *         schema: { type: string }
+ *         schema:
+ *           type: string
  *         description: ID de la empresa (UUID)
  *     responses:
- *       200: { description: Lista de seguimientos }
- *       400: { description: Falta empresa_id }
+ *       200:
+ *         description: Lista de seguimientos
+ *       400:
+ *         description: Falta empresa_id
  */
-router.get('/', (req, res) => seguimientoController.getByEmpresa(req, res));
+router.get("/", (req, res) => seguimientoController.getByEmpresa(req, res));
 
 /**
  * @swagger
@@ -37,13 +42,18 @@ router.get('/', (req, res) => seguimientoController.getByEmpresa(req, res));
  *       - in: query
  *         name: empresa_id
  *         required: true
- *         schema: { type: string }
+ *         schema:
+ *           type: string
  *         description: ID de la empresa (UUID)
  *     responses:
- *       200: { description: Resumen estadístico }
- *       400: { description: Falta empresa_id }
+ *       200:
+ *         description: Resumen estadístico
+ *       400:
+ *         description: Falta empresa_id
  */
-router.get('/resumen', (req, res) => seguimientoController.getResumen(req, res));
+router.get("/resumen", (req, res) =>
+  seguimientoController.getResumen(req, res),
+);
 
 /**
  * @swagger
@@ -55,60 +65,70 @@ router.get('/resumen', (req, res) => seguimientoController.getResumen(req, res))
  *       - in: path
  *         name: controlId
  *         required: true
- *         schema: { type: string }
+ *         schema:
+ *           type: string
+ *         description: ID del control
+ *       - in: query
+ *         name: empresa_id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID de la empresa
  *     responses:
- *       200: { description: Historial de seguimientos }
+ *       200:
+ *         description: Historial de seguimientos
+ *       400:
+ *         description: Falta empresa_id
  */
-router.get('/historial/:controlId', (req, res) => seguimientoController.getHistorial(req, res));
+router.get("/historial/:controlId", (req, res) =>
+  seguimientoController.getHistorial(req, res),
+);
 
 /**
  * @swagger
- * /seguimiento:
- *   post:
- *     summary: Crear un nuevo seguimiento
- *     tags: [Seguimiento]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               empresa_id: { type: string }
- *               control_id: { type: string }
- *               estado_id: { type: integer }
- *               nombre_del_responsable: { type: string }
- *               descripcion_justificacion: { type: string }
- *     responses:
- *       201: { description: Seguimiento creado }
- *       400: { description: Datos inválidos }
- */
-router.post('/', (req, res) => seguimientoController.create(req, res));
-
-/**
- * @swagger
- * /seguimiento/{id}:
+ * /seguimiento/control/{controlId}:
  *   put:
- *     summary: Actualizar un seguimiento
+ *     summary: Crear o actualizar el seguimiento de un control (upsert)
  *     tags: [Seguimiento]
  *     parameters:
  *       - in: path
- *         name: id
+ *         name: controlId
  *         required: true
- *         schema: { type: string }
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         description: ID del control
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - empresa_id
+ *               - quien_actualizo_id
+ *               - estado_id
  *             properties:
- *               estado_id: { type: integer }
- *               descripcion_justificacion: { type: string }
+ *               empresa_id:
+ *                 type: string
+ *               quien_actualizo_id:
+ *                 type: string
+ *               estado_id:
+ *                 type: integer
+ *               nombre_del_responsable:
+ *                 type: string
+ *               descripcion_justificacion:
+ *                 type: string
  *     responses:
- *       200: { description: Seguimiento actualizado }
- *       404: { description: No encontrado }
+ *       200:
+ *         description: Seguimiento creado o actualizado
+ *       400:
+ *         description: Datos inválidos
+ *       404:
+ *         description: Control no encontrado
  */
-router.put('/:id', (req, res) => seguimientoController.update(req, res));
+router.put("/control/:controlId", (req, res) =>
+  seguimientoController.upsert(req, res),
+);
 
 module.exports = router;
