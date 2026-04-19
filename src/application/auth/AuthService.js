@@ -45,8 +45,8 @@ class AuthService {
 
     const contrasena_suprema = await bcrypt.hash("Supremo2024!", 10);
     const adminSupremo = await this.usuarioRepository.create({
-      nombre_usuario: `SUPREMO_${codigo_unico_url}`,
-      correo_electronico: `supremo_${codigo_unico_url}@system.local`,
+      nombre_usuario: `USUARIO_SUPREMO`,
+      correo_electronico: `supremo_${nombre_comercial}`,
       contrasena_encriptada: contrasena_suprema,
       rol_id: 2,
       empresa_id: nuevaEmpresa.id_empresa,

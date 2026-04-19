@@ -1,14 +1,44 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const DashboardController = require('../controllers/DashboardController');
-const DashboardService = require('../../application/dashboard/DashboardService');
-const SeguimientoRepository = require('../../infrastructure/repositories/SeguimientoRepository');
-const ControlRepository = require('../../infrastructure/repositories/ControlRepository');
+const DashboardController = require("../controllers/DashboardController");
+const DashboardService = require("../../application/dashboard/DashboardService");
+const SeguimientoRepository = require("../../infrastructure/repositories/SeguimientoRepository");
+const ControlRepository = require("../../infrastructure/repositories/ControlRepository");
 
 const dashboardController = new DashboardController(
-  new DashboardService(new SeguimientoRepository(), new ControlRepository())
+  new DashboardService(new SeguimientoRepository(), new ControlRepository()),
 );
 
+/**
+ * @swagger
+ * /dashboard/cumplidos:
+ *   get:
+ *     summary: Obtener controles cumplidos (estado_id = 1) por empresa
+ *     tags: [Dashboard]
+ *     parameters:
+ *       - in: query
+ *         name: empresa_id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID de la empresa (UUID)
+ *     responses:
+ *       200:
+ *         description: Lista de controles cumplidos
+ *         content:
+ *           application/json:
+ *             example:
+ *               - id_seguimiento: "uuid"
+ *                 control_id: "uuid"
+ *                 fecha: "2026-04-19T16:52:20.511Z"
+ *                 responsable: "Juan Perez"
+ *                 justificacion: "Cumple correctamente"
+ *       400:
+ *         description: Falta empresa_id
+ */
+router.get("/cumplidos", (req, res) =>
+  dashboardController.getCumplidos(req, res),
+);
 /**
  * @swagger
  * /dashboard/metricas:
@@ -25,7 +55,9 @@ const dashboardController = new DashboardController(
  *       200: { description: Métricas calculadas }
  *       400: { description: Falta empresa_id }
  */
-router.get('/metricas', (req, res) => dashboardController.getMetricas(req, res));
+router.get("/metricas", (req, res) =>
+  dashboardController.getMetricas(req, res),
+);
 
 /**
  * @swagger
@@ -43,7 +75,9 @@ router.get('/metricas', (req, res) => dashboardController.getMetricas(req, res))
  *       200: { description: Lista de controles con brechas }
  *       400: { description: Falta empresa_id }
  */
-router.get('/gap-analysis', (req, res) => dashboardController.getGapAnalysis(req, res));
+router.get("/gap-analysis", (req, res) =>
+  dashboardController.getGapAnalysis(req, res),
+);
 
 /**
  * @swagger
@@ -61,6 +95,8 @@ router.get('/gap-analysis', (req, res) => dashboardController.getGapAnalysis(req
  *       200: { description: Datos por dominio }
  *       400: { description: Falta empresa_id }
  */
-router.get('/por-dominio', (req, res) => dashboardController.getPorDominio(req, res));
+router.get("/por-dominio", (req, res) =>
+  dashboardController.getPorDominio(req, res),
+);
 
 module.exports = router;

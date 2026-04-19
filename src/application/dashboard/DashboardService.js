@@ -34,6 +34,19 @@ class DashboardService {
     return Array.from(ultimosPorControl.values());
   }
 
+  async getControlesCumplidos(empresaId) {
+    const cumplidos =
+      await this.seguimientoRepository.findCumplidosByEmpresa(empresaId);
+
+    return cumplidos.map((c) => ({
+      id_seguimiento: c.id_seguimiento,
+      control_id: c.control_id,
+      fecha: c.fecha_de_modificacion,
+      responsable: c.nombre_del_responsable,
+      justificacion: c.descripcion_justificacion,
+    }));
+  }
+
   async getMetricas(empresaId) {
     const TOTAL_CONTROLES = await this.getTotalControles();
     const ultimosSeguimientos =
@@ -44,6 +57,7 @@ class DashboardService {
       "En Progreso": 0,
       "Pendiente Novedad": 0,
       "No Iniciado": 0,
+      "No Aplica": 0,
     };
 
     for (const s of ultimosSeguimientos) {

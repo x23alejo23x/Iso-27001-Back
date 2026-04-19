@@ -90,6 +90,23 @@ class SeguimientoRepository extends ISeguimientoRepository {
       take: 10,
     });
   }
+
+  async findCumplidosByEmpresa(empresaId) {
+    return await prisma.seguimiento_de_cumplimiento.findMany({
+      where: {
+        empresa_id: empresaId,
+        estado_id: 1,
+      },
+      include: {
+        biblioteca_de_controles: true,
+        estados_de_control: true,
+        usuarios: { select: { nombre_usuario: true } },
+      },
+      orderBy: {
+        fecha_de_modificacion: "desc",
+      },
+    });
+  }
 }
 
 module.exports = SeguimientoRepository;

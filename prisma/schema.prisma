@@ -38,6 +38,8 @@ model empresas {
   nombre_comercial            String                        @db.VarChar(150)
   codigo_unico_url            String                        @unique @db.VarChar(100)
   fecha_de_registro           DateTime?                     @default(now()) @db.Timestamptz(6)
+  fecha_inicio                DateTime?                     @db.Date
+  fecha_fin                   DateTime?                     @db.Date
   departamentos               departamentos[]
   seguimiento_de_cumplimiento seguimiento_de_cumplimiento[]
   usuarios                    usuarios[]
