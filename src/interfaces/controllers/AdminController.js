@@ -89,12 +89,12 @@ class AdminController {
       if (!empresa_id)
         return res.status(400).json({ message: "empresa_id es requerido" });
 
-      if (rol_id && (Number(rol_id) === 1 || Number(rol_id) === 2)) {
-        return res.status(403).json({
-          message:
-            "No tiene permisos para asignar roles de Administrador o Administrador Supremo",
-        });
-      }
+      // if (rol_id && (Number(rol_id) === 1 || Number(rol_id) === 2)) {
+      //   return res.status(403).json({
+      //     message:
+      //       "No tiene permisos para asignar roles de Administrador o Administrador Supremo",
+      //   });
+      // }
 
       const usuario = await this.adminService.editarUsuario(id, empresa_id, {
         nombre_usuario,
