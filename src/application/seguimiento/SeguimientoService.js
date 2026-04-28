@@ -12,18 +12,31 @@ class SeguimientoService {
       data.empresa_id,
     );
 
-    if (existing && existing.estado_id === data.estado_id) {
-      return existing;
-    }
-    return await this.seguimientoRepository.create({
-      control_id: data.control_id,
-      empresa_id: data.empresa_id,
+    const payload = {
       estado_id: data.estado_id,
       nombre_del_responsable: data.nombre_del_responsable,
       descripcion_justificacion: data.descripcion_justificacion,
       quien_actualizo_id: data.quien_actualizo_id,
-    });
+      fecha_de_modificacion: new Date(),
+      url_evidencia: data.url_evidencia || null, // ✅ campo nuevo
+    };
+
+    if (existing) {
+      // Actualizar el seguimiento existente
+      return await this.seguimientoRepository.update(
+        existing.id_seguimiento,
+        payload,
+      );
+    } else {
+      // Crear uno nuevo
+      return await this.seguimientoRepository.create({
+        control_id: data.control_id,
+        empresa_id: data.empresa_id,
+        ...payload,
+      });
+    }
   }
+
   async update(id, data, empresaId) {
     const seguimiento = await this.seguimientoRepository.findById(id);
     if (!seguimiento || seguimiento.empresa_id !== empresaId)

@@ -5,15 +5,11 @@ const prisma = require("../database/prisma");
 class SeguimientoRepository extends ISeguimientoRepository {
   async findByControlAndEmpresa(controlId, empresaId) {
     return await prisma.seguimiento_de_cumplimiento.findFirst({
-      where: {
-        control_id: controlId,
-        empresa_id: empresaId,
-      },
-      orderBy: {
-        fecha_de_modificacion: "desc",
-      },
+      where: { control_id: controlId, empresa_id: empresaId },
+      orderBy: { fecha_de_modificacion: "desc" },
     });
   }
+
   async findById(id) {
     return await prisma.seguimiento_de_cumplimiento.findUnique({
       where: { id_seguimiento: id },
@@ -21,9 +17,18 @@ class SeguimientoRepository extends ISeguimientoRepository {
   }
 
   async update(id, data) {
+    // Construir objeto con los nombres exactos del modelo
+    const updateData = {
+      estado_id: data.estado_id,
+      nombre_del_responsable: data.nombre_del_responsable,
+      descripcion_justificacion: data.descripcion_justificacion,
+      quien_actualizo_id: data.quien_actualizo_id,
+      fecha_de_modificacion: new Date(),
+      Url_Evidencia: data.url_evidencia || null, // ← nombre correcto en BD
+    };
     return await prisma.seguimiento_de_cumplimiento.update({
       where: { id_seguimiento: id },
-      data,
+      data: updateData,
       include: {
         biblioteca_de_controles: true,
         estados_de_control: true,
@@ -41,6 +46,7 @@ class SeguimientoRepository extends ISeguimientoRepository {
         descripcion_justificacion: data.descripcion_justificacion,
         quien_actualizo_id: data.quien_actualizo_id,
         fecha_de_modificacion: new Date(),
+        Url_Evidencia: data.url_evidencia || null, // ← agregado
       },
       include: {
         biblioteca_de_controles: true,
@@ -102,9 +108,7 @@ class SeguimientoRepository extends ISeguimientoRepository {
         estados_de_control: true,
         usuarios: { select: { nombre_usuario: true } },
       },
-      orderBy: {
-        fecha_de_modificacion: "desc",
-      },
+      orderBy: { fecha_de_modificacion: "desc" },
     });
   }
 }

@@ -13,6 +13,7 @@ class SeguimientoController {
         estado_id,
         nombre_del_responsable,
         descripcion_justificacion,
+        url_evidencia,
       } = req.body;
 
       if (!empresa_id || !quien_actualizo_id || !controlId || !estado_id) {
@@ -29,6 +30,7 @@ class SeguimientoController {
         nombre_del_responsable,
         descripcion_justificacion,
         quien_actualizo_id,
+        url_evidencia,
       });
 
       res.json(result);

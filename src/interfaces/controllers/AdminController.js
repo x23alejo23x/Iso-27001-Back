@@ -110,6 +110,37 @@ class AdminController {
     }
   }
 
+  async actualizarFechasEmpresa(req, res) {
+    try {
+      const { empresa_id, fecha_inicio, fecha_fin } = req.body;
+      if (!empresa_id) {
+        return res.status(400).json({ message: "empresa_id es requerido" });
+      }
+
+      if (fecha_inicio && isNaN(new Date(fecha_inicio).getTime())) {
+        return res.status(400).json({ message: "fecha_inicio no es válida" });
+      }
+      if (fecha_fin && isNaN(new Date(fecha_fin).getTime())) {
+        return res.status(400).json({ message: "fecha_fin no es válida" });
+      }
+
+      const empresaActualizada =
+        await this.adminService.actualizarFechasEmpresa(
+          empresa_id,
+          fecha_inicio,
+          fecha_fin,
+        );
+      res.json(empresaActualizada);
+    } catch (error) {
+      if (error.message === "Empresa no encontrada") {
+        return res.status(404).json({ message: error.message });
+      }
+      if (error.message.includes("fecha")) {
+        return res.status(400).json({ message: error.message });
+      }
+      res.status(500).json({ message: error.message });
+    }
+  }
   async eliminarUsuario(req, res) {
     try {
       const { id } = req.params;

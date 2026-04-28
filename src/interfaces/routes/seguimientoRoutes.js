@@ -119,13 +119,12 @@ router.get("/historial/:controlId", (req, res) =>
  *                 type: string
  *               descripcion_justificacion:
  *                 type: string
+ *               url_evidencia:
+ *                 type: string
+ *                 description: URL opcional de la evidencia
  *     responses:
  *       200:
  *         description: Seguimiento creado o actualizado
- *       400:
- *         description: Datos inválidos
- *       404:
- *         description: Control no encontrado
  */
 router.put("/control/:controlId", (req, res) =>
   seguimientoController.upsert(req, res),

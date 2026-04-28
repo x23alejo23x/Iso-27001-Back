@@ -243,5 +243,37 @@ router.post("/departamentos", (req, res) =>
 router.delete("/departamentos/:id", (req, res) =>
   adminController.eliminarDepartamento(req, res),
 );
+/**
+ * @swagger
+ * /admin/empresa/fechas:
+ *   put:
+ *     summary: Actualizar fechas de inicio y fin de la empresa
+ *     tags: [Admin]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               empresa_id:
+ *                 type: string
+ *                 description: ID de la empresa (UUID)
+ *               fecha_inicio:
+ *                 type: string
+ *                 format: date
+ *                 description: Fecha de inicio (YYYY-MM-DD)
+ *               fecha_fin:
+ *                 type: string
+ *                 format: date
+ *                 description: Fecha de fin (YYYY-MM-DD)
+ *     responses:
+ *       200: { description: Fechas actualizadas correctamente }
+ *       400: { description: Datos inválidos o faltantes }
+ *       404: { description: Empresa no encontrada }
+ */
+router.put("/empresa/fechas", (req, res) =>
+  adminController.actualizarFechasEmpresa(req, res),
+);
 
 module.exports = router;

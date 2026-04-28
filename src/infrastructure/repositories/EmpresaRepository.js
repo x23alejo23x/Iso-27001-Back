@@ -22,8 +22,15 @@ class EmpresaRepository extends IEmpresaRepository {
     });
   }
 
-  async findAll() {
-    return await prisma.empresas.findMany();
+  async updateFechas(id, fecha_inicio, fecha_fin) {
+    const data = {};
+    if (fecha_inicio) data.fecha_inicio = new Date(fecha_inicio);
+    if (fecha_fin) data.fecha_fin = new Date(fecha_fin);
+
+    return await prisma.empresas.update({
+      where: { id_empresa: id },
+      data,
+    });
   }
 }
 

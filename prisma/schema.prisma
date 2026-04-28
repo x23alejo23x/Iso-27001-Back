@@ -79,6 +79,9 @@ model seguimiento_de_cumplimiento {
   quien_actualizo_id        String?                  @db.Uuid
   fecha_de_modificacion     DateTime?                @default(now()) @db.Timestamptz(6)
   descripcion_justificacion String?
+  estado_sugerido_ia        String?                  @db.VarChar(20)
+  justificacion_ia          String?
+  Url_Evidencia             String?                  @db.VarChar
   evidencias_del_control    evidencias_del_control[]
   biblioteca_de_controles   biblioteca_de_controles? @relation(fields: [control_id], references: [id_control_maestro], onDelete: NoAction, onUpdate: NoAction)
   empresas                  empresas?                @relation(fields: [empresa_id], references: [id_empresa], onDelete: Cascade, onUpdate: NoAction)

@@ -79,6 +79,26 @@ class AdminService {
       descripcion,
     });
   }
+  async actualizarFechasEmpresa(empresaId, fecha_inicio, fecha_fin) {
+    const empresa = await this.empresaRepository.findById(empresaId);
+    if (!empresa) throw new Error("Empresa no encontrada");
+
+    if (fecha_inicio && fecha_fin) {
+      const inicio = new Date(fecha_inicio);
+      const fin = new Date(fecha_fin);
+      if (inicio > fin) {
+        throw new Error(
+          "La fecha de inicio no puede ser posterior a la fecha de fin",
+        );
+      }
+    }
+
+    return await this.empresaRepository.updateFechas(
+      empresaId,
+      fecha_inicio,
+      fecha_fin,
+    );
+  }
 
   async actualizarDepartamento(departamentoId, empresaId, data) {
     // Verificar que el departamento pertenece a la empresa
