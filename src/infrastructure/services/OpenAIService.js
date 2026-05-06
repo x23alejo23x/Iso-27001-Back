@@ -5,6 +5,10 @@ async function analizarDocumentoControles(textoPDF, control) {
   const client = new OpenAI({
     apiKey: env.OPENAI_API_KEY,
     baseURL: "https://openrouter.ai/api/v1",
+    defaultHeaders: {
+      "HTTP-Referer": "http://localhost:3000",
+      "X-Title": "Auditor ISO27001",
+    },
   });
 
   const prompt = `
