@@ -12,7 +12,7 @@ const adminRoutes = require("./interfaces/routes/adminRoutes");
 const controlRoutes = require("./interfaces/routes/controlRoutes");
 const seguimientoRoutes = require("./interfaces/routes/seguimientoRoutes");
 const evidenciaRoutes = require("./interfaces/routes/evidenciaRoutes");
-const dashboardRoutes = require("./interfaces/routes/dashboardRoutes");
+const dashboardRoutes = require("./interfaces/routes/dashboardroutes");
 const catalogRoutes = require("./interfaces/routes/catalogRoutes");
 const analisisIARoutes = require("./interfaces/routes/analisisIARoutes");
 
@@ -62,6 +62,6 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`🚀 Servidor iniciado en puerto ${PORT}`);
+  console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
   console.log(`📄 Swagger en http://localhost:${PORT}/api-docs`);
 });
