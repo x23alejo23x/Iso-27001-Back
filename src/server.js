@@ -5,16 +5,33 @@ const swaggerUi = require("swagger-ui-express");
 const swaggerSpec = require("./config/swagger");
 const { PORT } = require("./config/env");
 const prisma = require("./infrastructure/database/prisma");
+const path = require("path"); // 👈 Agregado para resolver rutas absolutas de forma segura
 
-// Rutas
-const authRoutes = require("./interfaces/routes/authRoutes");
-const adminRoutes = require("./interfaces/routes/adminRoutes");
-const controlRoutes = require("./interfaces/routes/controlRoutes");
-const seguimientoRoutes = require("./interfaces/routes/seguimientoRoutes");
-const evidenciaRoutes = require("./interfaces/routes/evidenciaRoutes");
-const dashboardRoutes = require("./interfaces/routes/dashboardroutes");
-const catalogRoutes = require("./interfaces/routes/catalogRoutes");
-const analisisIARoutes = require("./interfaces/routes/analisisIARoutes");
+// Rutas usando path.resolve (Mapeado exacto según tu árbol de archivos)
+const authRoutes = require(
+  path.resolve(__dirname, "interfaces/routes/authRoutes"),
+);
+const adminRoutes = require(
+  path.resolve(__dirname, "interfaces/routes/adminRoutes"),
+);
+const controlRoutes = require(
+  path.resolve(__dirname, "interfaces/routes/controlRoutes"),
+);
+const seguimientoRoutes = require(
+  path.resolve(__dirname, "interfaces/routes/seguimientoRoutes"),
+);
+const evidenciaRoutes = require(
+  path.resolve(__dirname, "interfaces/routes/evidenciaRoutes"),
+);
+const dashboardRoutes = require(
+  path.resolve(__dirname, "interfaces/routes/dashboardroutes"),
+); // Con "r" minúscula como en tu foto
+const catalogRoutes = require(
+  path.resolve(__dirname, "interfaces/routes/catalogRoutes"),
+);
+const analisisIARoutes = require(
+  path.resolve(__dirname, "interfaces/routes/analisisIARoutes"),
+);
 
 const app = express();
 
