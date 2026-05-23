@@ -5,15 +5,15 @@ const swaggerUi = require("swagger-ui-express");
 const swaggerSpec = require("./config/swagger");
 const { PORT } = require("./config/env");
 const prisma = require("./infrastructure/database/prisma");
-const path = require("path"); // 👈 Agregado para resolver rutas absolutas de forma segura
+const path = require("path");
 
-// Rutas usando path.resolve (Mapeado exacto según tu árbol de archivos)
+// Cambia estas líneas exactas en tu src/server.js para que coincidan con Git:
 const authRoutes = require(
   path.resolve(__dirname, "interfaces/routes/authRoutes"),
 );
 const adminRoutes = require(
-  path.resolve(__dirname, "interfaces/routes/adminRoutes"),
-);
+  path.resolve(__dirname, "interfaces/routes/Adminroutes"),
+); // 👈 Con A mayúscula y r minúscula
 const controlRoutes = require(
   path.resolve(__dirname, "interfaces/routes/controlRoutes"),
 );
@@ -24,8 +24,8 @@ const evidenciaRoutes = require(
   path.resolve(__dirname, "interfaces/routes/evidenciaRoutes"),
 );
 const dashboardRoutes = require(
-  path.resolve(__dirname, "interfaces/routes/dashboardroutes"),
-); // Con "r" minúscula como en tu foto
+  path.resolve(__dirname, "interfaces/routes/Dashboardroutes"),
+); // 👈 Con D mayúscula y r minúscula
 const catalogRoutes = require(
   path.resolve(__dirname, "interfaces/routes/catalogRoutes"),
 );
